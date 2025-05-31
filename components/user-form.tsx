@@ -90,6 +90,7 @@ export function UserForm() {
         id: Date.now().toString(),
         ...data,
         images,
+        imageType: "blob", // New users use blob storage
         biodata: shouldIncludeBiodata()
           ? {
               type: biodataType,
@@ -236,6 +237,7 @@ export function UserForm() {
                   onImagesChange={(newImages) => setBiodataImage(newImages[0] || "")}
                   maxImages={1}
                   label="Upload biodata image"
+                  useBlob={true}
                 />
               </TabsContent>
             </Tabs>

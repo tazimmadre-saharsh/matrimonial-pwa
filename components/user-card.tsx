@@ -1,24 +1,39 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import type { User } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Calendar } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { storage } from "@/lib/storage"
 
 interface UserCardProps {
   user: User
 }
 
 export function UserCard({ user }: UserCardProps) {
-  const primaryImage = user.images[0] || "/placeholder.svg?height=200&width=200"
+  const [primaryImageUrl, setPrimaryImageUrl] = useState<string>("/placeholder.svg?height=200&width=200")
+
+  useEffect(() => {
+    const loadPrimaryImage = async () => {
+      if (user.images.length > 0) {
+        const imageUrls = await storage.getImageUrls(user)
+        if (imageUrls.length > 0) {
+          setPrimaryImageUrl(imageUrls[0])
+        }
+      }
+    }
+
+    loadPrimaryImage()
+  }, [user])
 
   return (
     <Link href={`/user/${user.id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer touch-manipulation active:scale-95 transition-transform">
         <div className="aspect-square relative">
-          <Image src={primaryImage || "/placeholder.svg"} alt={user.fullName} fill className="object-cover" />
+          <Image src={primaryImageUrl} alt={user.fullName} fill className="object-contain" />
           <Badge variant={user.gender === "male" ? "default" : "secondary"} className="absolute top-2 right-2 text-xs">
             {user.gender}
           </Badge>

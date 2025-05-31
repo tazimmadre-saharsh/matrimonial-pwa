@@ -16,10 +16,28 @@ interface UserDetailProps {
 
 export function UserDetail({ userId }: UserDetailProps) {
   const [user, setUser] = useState<User | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [biodataImageUrl, setBiodataImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    const userData = storage.getUserById(userId)
-    setUser(userData)
+    const loadUserData = async () => {
+      const userData = storage.getUserById(userId)
+      if (userData) {
+        setUser(userData)
+
+        // Load image URLs
+        const urls = await storage.getImageUrls(userData)
+        setImageUrls(urls)
+
+        // Load biodata image URL if exists
+        if (userData.biodata?.type === "image") {
+          const biodataUrl = await storage.getBiodataImageUrl(userData)
+          setBiodataImageUrl(biodataUrl)
+        }
+      }
+    }
+
+    loadUserData()
   }, [userId])
 
   if (!user) {
@@ -60,7 +78,7 @@ export function UserDetail({ userId }: UserDetailProps) {
           </div>
         </CardHeader>
         <CardContent className="px-4 sm:px-6">
-          <ImageCarousel images={user.images} alt={user.fullName} />
+          <ImageCarousel images={imageUrls} alt={user.fullName} />
         </CardContent>
       </Card>
 
@@ -122,13 +140,15 @@ export function UserDetail({ userId }: UserDetailProps) {
               </div>
             ) : (
               <div className="max-w-sm sm:max-w-md mx-auto">
-                <Image
-                  src={user.biodata.content || "/placeholder.svg"}
-                  alt="Biodata"
-                  width={400}
-                  height={600}
-                  className="w-full h-auto rounded-lg border"
-                />
+                  {biodataImageUrl && (
+                    <Image
+                      src={biodataImageUrl}
+                      alt="Biodata"
+                      width={400}
+                      height={600}
+                      className="w-full h-auto rounded-lg border"
+                    />
+                  )}
               </div>
             )}
           </CardContent>

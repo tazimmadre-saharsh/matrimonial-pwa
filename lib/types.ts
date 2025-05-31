@@ -4,10 +4,11 @@ export interface User {
   age: number
   location: string
   gender: "male" | "female"
-  images: string[] // base64 encoded images
+  images: string[] // Can be base64 encoded images OR blob IDs
+  imageType?: "base64" | "blob" // Indicates storage type, defaults to base64 for backward compatibility
   biodata?: {
     type: "text" | "image"
-    content: string
+    content: string // Can be base64 or blob ID depending on imageType
   }
   createdAt: string
 }
