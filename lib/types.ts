@@ -15,4 +15,6 @@ export interface User {
 
 export interface FilterOptions {
   gender: "all" | "male" | "female"
+  search: string
+  sortBy: "newest" | "oldest" | "name-asc" | "name-desc" | "age-asc" | "age-desc"
 }
